@@ -21,7 +21,7 @@ publish-flightcheck: freeze
 	python setup.py sdist
 
 publish: freeze
-	python setup.py sdist upload -r nexus
+	python setup.py sdist upload -r pypi
 
 clean :
 	rm -rf dist \
