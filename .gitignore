@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files
+led / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -99,3 +99,16 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# JetBrains
+.idea
+
+# Packages
+*.tar.gz
+
+# make
+.makefile.*
+.Makefile.*
+
+# Scratch Files
+scratch*
