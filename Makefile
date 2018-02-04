@@ -20,7 +20,7 @@ docs: coverage
 publish-flightcheck: freeze
 	python setup.py sdist
 
-publish: freeze
+publish:
 	python setup.py sdist upload -r pypi
 
 clean :
