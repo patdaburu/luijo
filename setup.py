@@ -9,7 +9,7 @@ This file is used to create the package we'll publish to PyPI.
 """
 
 import os
-import luiji
+import luijo
 from setuptools import setup, find_packages, Command  # Always prefer setuptools over distutils
 from codecs import open  # To use a consistent encoding
 from os import path
@@ -21,7 +21,7 @@ with open(path.join(here, 'README'), encoding='utf-8') as f:
     long_description = f.read()
 
 # Get the base version from the library.
-version = luiji.__version__
+version = luijo.__version__
 
 # If the environment has a build number set...
 if os.getenv('buildnum') is not None:
@@ -29,7 +29,7 @@ if os.getenv('buildnum') is not None:
     version = "{version}.{buildnum}".format(version=version, buildnum=os.getenv('buildnum'))
 
 setup(
-  name='luiji',
+  name='luijo',
   description="Extensions for Spotify Luigi",
   long_description=long_description,
   packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
@@ -42,7 +42,7 @@ setup(
   license='MIT',
   author='Pat Daburu',
   author_email='patb@daburu.net',
-  url='https://github.com/patdaburu/luiji.git',  # Use the URL to the github repo.
+  url='https://github.com/patdaburu/luijo.git',  # Use the URL to the github repo.
   download_url='https://github.com/patdaburu/luiji/archive/{version}.tar.gz'.format(version=version),
   keywords=[
 

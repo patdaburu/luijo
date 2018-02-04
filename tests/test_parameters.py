@@ -3,8 +3,8 @@
 
 import pytest
 import unittest
-from luiji.parameters import is_empty_parameter, ClassParameter
-from luiji.tasks import Task
+from luijo.parameters import is_empty_parameter, ClassParameter
+from luijo.tasks import Task
 
 
 class TestParametersSuite(unittest.TestCase):
@@ -22,12 +22,12 @@ class TestParametersSuite(unittest.TestCase):
 class TestClassParameterSuite(unittest.TestCase):
 
     def test_parse_success(self):
-        self.assertIs(Task, ClassParameter.parse('luiji.tasks.Task'))
+        self.assertIs(Task, ClassParameter.parse('luijo.tasks.Task'))
         self.assertIs(Task, ClassParameter.parse(Task))
 
     def test_serialize_success(self):
-        self.assertEqual('luiji.tasks.Task', ClassParameter.serialize('luiji.tasks.Task'))
-        self.assertEqual('luiji.tasks.Task', ClassParameter.serialize(Task))
+        self.assertEqual('luijo.tasks.Task', ClassParameter.serialize('luijo.tasks.Task'))
+        self.assertEqual('luijo.tasks.Task', ClassParameter.serialize(Task))
 
     def test_serialize_raisesValueError(self):
         with pytest.raises(ValueError):

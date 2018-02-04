@@ -4,7 +4,7 @@
 import luigi
 import pytest
 import unittest
-from luiji.tasks import Task, TaskContact, TaskDescriptor, taskinfo
+from luijo.tasks import Task, TaskContact, TaskDescriptor, taskinfo
 
 
 @taskinfo(

@@ -3,8 +3,8 @@
 
 import pytest
 import unittest
-from luiji.parameters import is_empty_parameter, ClassParameter
-from luiji.targets import Target
+from luijo.parameters import is_empty_parameter, ClassParameter
+from luijo.targets import Target
 
 
 class TestTarget(Target):

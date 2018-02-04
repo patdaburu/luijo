@@ -5,38 +5,38 @@
 
 API Documentation
 =================
-Say something interesting about your project.
+Here are the luigi API's details.
 
 -----
-luiji
+luijo
 -----
-.. automodule:: luiji
+.. automodule:: luijo
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
 
 ----------------
-luiji.parameters
+luijo.parameters
 ----------------
-.. automodule:: luiji.parameters
+.. automodule:: luijo.parameters
     :members:
     :undoc-members:
     :show-inheritance:
 
 -------------
-luiji.targets
+luijo.targets
 -------------
-.. automodule:: luiji.targets
+.. automodule:: luijo.targets
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
 
 -----------
-luiji.tasks
+luijo.tasks
 -----------
-.. automodule:: luiji.tasks
+.. automodule:: luijo.tasks
     :members:
     :undoc-members:
     :show-inheritance:
