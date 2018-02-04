@@ -5,7 +5,7 @@
 
 API Documentation
 =================
-Here are the luigi API's details.
+Here are the luigo API's details.
 
 -----
 luijo
