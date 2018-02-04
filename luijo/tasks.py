@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-.. currentmodule:: luiji.tasks
+.. currentmodule:: luijo.tasks
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 
 Herein you'll find kindly assistance for working with Luigi tasks.
@@ -256,7 +256,7 @@ def taskinfo(friendly_name: str,
     :param contact: contact information for this task
     :return: The decorator returns the original class, after it's been modified.
     """
-    def set_task_info(cls: Task):
+    def set_task_info(cls: Type[Task]):
         """
         Update the task information dictionary in the Task class.
         :param cls: the :py:class:`Task` class

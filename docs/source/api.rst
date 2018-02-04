@@ -30,7 +30,6 @@ luijo.targets
 .. automodule:: luijo.targets
     :members:
     :undoc-members:
-    :inherited-members:
     :show-inheritance:
 
 -----------

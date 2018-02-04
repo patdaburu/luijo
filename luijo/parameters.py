@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-.. currentmodule:: luiji.parameters
+.. currentmodule:: luijo.parameters
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 
 These are custom parameters for use in Luigi scripts.

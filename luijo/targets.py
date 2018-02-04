@@ -2,35 +2,43 @@
 # -*- coding: utf-8 -*-
 
 """
-.. currentmodule:: luiji.tasks
+.. currentmodule:: luijo.tasks
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 
 Luigi targets, plus just a little more.
 """
 
 from abc import ABCMeta, abstractmethod
+import jsonpickle
 import luigi.target
-import logging
+from typing import Any
 
 
-class Target(luigi.Target):
+class LocalObjectTarget(luigi.LocalTarget):
     """
-    This is a common parent class that provides some additional conveniences for Luigi targets.
+    This is a local target you can use to serialize a Python object to a file.
     """
     __metaclass__ = ABCMeta
 
-    @abstractmethod
-    def exists(self):
+    def deserialize(self) -> Any:
         """
-        Does the target exist?
-        :return:
+        Retrieve the target object.
+        :return: the target object
         """
-        raise NotImplementedError('The subclass must implement this method.')
+        with self.open('r') as fin:
+            frozen = fin.read()
+            thawed = jsonpickle.decode(frozen)
+            return thawed
 
-    @classmethod
-    def get_logger(cls) -> logging.Logger:
+    def serialize(self, obj: Any):
         """
-        Get this target's logger.
-        :return: the target's logger
+        Serialize an object to the local target.
+        :param obj: the object you want to serialize
         """
-        return logging.getLogger('{module}.{cls}'.format(module=cls.__module__, cls=cls.__name__))
+        # Encode the object.
+        frozen = jsonpickle.encode(obj)
+        # Open the output file for writing.
+        with self.open('w') as fout:
+            # Write the encoded object.
+            fout.write(frozen)
+
