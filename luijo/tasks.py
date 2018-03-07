@@ -93,10 +93,10 @@ class Task(luigi.Task):
         super().__init__(*args, **kwargs)
         # Replace the defined 'run' method with a partial function calling the protected wrapper method which will
         # in turn call the original method.
-        self.run = partial(self._mario_run, self.run)
+        self.run = partial(self._luijo_run, self.run)
         # Replace the defined 'requires' method with a partial function calling the protected wrapper method which
         # will in turn call the original method.
-        self.requires = partial(self._mario_requires, self.requires)
+        self.requires = partial(self._luijo_requires, self.requires)
 
     def _augment_descriptor(self,
                             descriptor: TaskDescriptor) -> TaskDescriptor:
@@ -116,7 +116,7 @@ class Task(luigi.Task):
         # Return it.
         return copy
 
-    def _mario_requires(self, requires):
+    def _luijo_requires(self, requires):
         """
         This is a wrapper for the task's :py:func:`requires` method.
         :param requires: the original :py:func:`requires` method
@@ -148,7 +148,7 @@ class Task(luigi.Task):
         return luigi.LocalTarget("{basename}.{runid}".format(basename=self.get_logger().name,
                                                              runid=self.runid))
 
-    def _mario_run(self, run):
+    def _luijo_run(self, run):
         """
         This is the method that will be called when the task is run.  It will perform additional logic before and
         after executing the original :py:func:`luigi.Task.run` function.
