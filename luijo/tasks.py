@@ -236,11 +236,16 @@ class Task(luigi.Task):
                 date=ctx.started.strftime('%d/%m/%Y')))
         # Perform the before-run tasks.
         self.before_run(ctx=ctx)
-        # If the subclass has implemented run...
+        # If the subclass has actually implemented run()...
         if run.__func__ != Task.run:
-            raise RuntimeError('Implement on_run instead of run.')  # TODO: Improve this handling!
-        # Perform the run tasks.
-        self.on_run(ctx=ctx)
+            # ...complain a little.
+            self.get_logger().warning(
+                'Implement on_run instead of run.')
+            # Now go ahead and run it.
+            run()
+        else:
+            # Perform the regular logic.
+            self.on_run(ctx=ctx)
         # Make note of when the task completed (again... that's right now).
         ctx.finish()
         # Perform the after-run tasks.
@@ -251,22 +256,44 @@ class Task(luigi.Task):
                 seconds=ctx.runtime.total_seconds()))
 
     def run(self):
+        """
+        Rather than implementing :py:func:`run` take advantage of the
+        run context you can get with :py:func:`on_run`.
+
+        :raises NotImplementedError: if called
+        """
         raise NotImplementedError('Implement on_run instead.')
 
     def before_run(self, ctx: RunContext):
+        """
+        Perform any steps that are required before the task runs.
+
+        :param ctx: the current run context
+        """
         pass
 
     @abstractmethod
     def on_run(self, ctx: RunContext):
+        """
+        Override this method to perform the primary task logic.
+
+        :param ctx: the current run context
+        """
         raise NotImplementedError('This method must be implemented for the task to do anything useful.')
 
     def after_run(self, ctx: RunContext):
+        """
+        Perform any stesp that are required after the task runs.
+
+        :param ctx: the current run context
+        """
         pass
 
     @property
     def friendly_name(self) -> str:
         """
         This is a human-friendly name for the task.
+
         :return: the task's friendly name
         """
         return self._get_task_info_attr('friendly_name')
@@ -275,6 +302,7 @@ class Task(luigi.Task):
     def synopsis(self) -> str:
         """
         This is a brief synopsis of what the task does.
+
         :return: the task's synopsis
         """
         return self._get_task_info_attr('synopsis')
@@ -283,6 +311,7 @@ class Task(luigi.Task):
     def description(self) -> str:
         """
         This is a nice, long, thorough description of what the task does.
+
         :return: the task's description
         """
         return self._get_task_info_attr('description')
@@ -291,6 +320,7 @@ class Task(luigi.Task):
     def contact(self) -> TaskContact:
         """
         This is contact information for the task.
+
         :return: the task's contact information
         """
         return self._get_task_info_attr('contact')
@@ -298,6 +328,7 @@ class Task(luigi.Task):
     def _get_task_info_attr(self, attr: str) -> Any:
         """
         Get a task information item.
+
         :param attr: the information item's key
         :return: the value
         """
@@ -309,7 +340,10 @@ class Task(luigi.Task):
     @classmethod
     def get_task_info(cls) -> Dict[str, Any]:
         """
-        Retrieve the task's metadata dictionary.  (You probably don't actually need this.)
+        Retrieve the task's metadata dictionary.  (You probably don't need to
+        call this unless you're actually doing work applicable to task
+        objects in general.)
+
         :return: the metadata dictionary
         """
         if not hasattr(cls, '_task_info'):
@@ -322,7 +356,7 @@ class Task(luigi.Task):
         Get this task's logger.
         :return: the task's logger
         """
-        return logging.getLogger('{module}.{cls}'.format(module=cls.__module__, cls=cls.__name__))
+        return logging.getLogger('{module}.{cls}'.format(module=cls.__module__, cls=cls.__name__))  # TODO: Centralize this.
 
 
 def taskinfo(friendly_name: str,
@@ -331,6 +365,7 @@ def taskinfo(friendly_name: str,
              contact: TaskContact):
     """
     Use this decorator to provide helpful information about your task.
+
     :param friendly_name: a brief, human-friendly name for the task
     :param synopsis: a brief description of what the task does
     :param description: a nice, long, thorough description of what this task is
