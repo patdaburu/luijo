@@ -236,7 +236,9 @@ class Task(luigi.Task):
                 date=ctx.started.strftime('%d/%m/%Y')))
         # Perform the before-run tasks.
         self.before_run(ctx=ctx)
-        run()
+        # If the subclass has implemented run...
+        if run.__func__ != Task.run:
+            raise RuntimeError('Implement on_run instead of run.')  # TODO: Improve this handling!
         # Perform the run tasks.
         self.on_run(ctx=ctx)
         # Make note of when the task completed (again... that's right now).
@@ -249,13 +251,14 @@ class Task(luigi.Task):
                 seconds=ctx.runtime.total_seconds()))
 
     def run(self):
-        pass
+        raise NotImplementedError('Implement on_run instead.')
 
     def before_run(self, ctx: RunContext):
         pass
 
+    @abstractmethod
     def on_run(self, ctx: RunContext):
-        pass
+        raise NotImplementedError('This method must be implemented for the task to do anything useful.')
 
     def after_run(self, ctx: RunContext):
         pass

@@ -4,7 +4,7 @@
 import luigi
 import pytest
 import unittest
-from luijo.tasks import Task, TaskContact, TaskDescriptor, taskinfo
+from luijo.tasks import Task, TaskContact, TaskDescriptor, taskinfo, RunContext
 
 
 @taskinfo(
@@ -16,7 +16,8 @@ from luijo.tasks import Task, TaskContact, TaskDescriptor, taskinfo
                         phone='180-555-1212'))
 class TestDependencyTask(Task):
     __test__ = False
-    def run(self):
+
+    def on_run(self, ctx: RunContext):
         pass
 
 
@@ -33,7 +34,7 @@ class TestTask(Task):
     def requires(self):
         return [TaskDescriptor(TestDependencyTask), TestDependencyTask]
 
-    def run(self):
+    def on_run(self, ctx: RunContext):
         pass
 
 
@@ -47,7 +48,7 @@ class TestTask(Task):
 class NoRequirementsTestTask(Task):
     __test__ = False
 
-    def run(self):
+    def on_run(self, ctx: RunContext):
         pass
 
 
@@ -59,8 +60,8 @@ class NoRequirementsTestTask(Task):
                         email='pat@daburu.net',
                         phone='180-555-1212'))
 class CallParentRunTestTask(Task):
-    def run(self):
-        super().run()
+    def on_run(self, ctx: RunContext):
+        super.on_run(ctx)
 
 
 class TestTaskContactSuite(unittest.TestCase):
