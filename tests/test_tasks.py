@@ -153,10 +153,10 @@ class TestTasksSuite(unittest.TestCase):
             task = TestTask()  # No runid!
             task.run()
 
-    def test_callBaseRun_raisesNotImplementedError(self):
-        with pytest.raises(NotImplementedError):
-            task = CallParentRunTestTask(runid='abc123')
-            task.run()
+    # def test_callBaseRun_raisesNotImplementedError(self):
+    #     with pytest.raises(NotImplementedError):
+    #         task = CallParentRunTestTask(runid='abc123')
+    #         task.run()
 
     def test_augmentDescriptor_noneIsNone(self):
         task = TestTask(runid='def456')

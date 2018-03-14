@@ -23,7 +23,8 @@ TaskContact = namedtuple('TaskContact', ['name', 'email', 'phone'])  #: Contact 
 class TaskDescriptor(object):
 
     """
-    A task descriptor contains the information necessary to create a new task instance.
+    A task descriptor contains the information necessary to create a new task
+    instance.
     """
     def __init__(self, cls: Type[luigi.Task], **kwargs):
         """
@@ -31,13 +32,16 @@ class TaskDescriptor(object):
         :param kwargs: the constructor arguments
         """
         self._cls: Type[luigi.Task] = cls  #: the Task class
-        self._kwargs: Dict[str, any] = {k: v for (k, v) in kwargs.items()}  #: the constructor arguments
+        self._kwargs: Dict[str, any] = {
+            k: v for (k, v) in kwargs.items()
+        }  #: the constructor arguments
 
     def defines(self, param) -> bool:
         """
         Does this descriptor define a given parameter?
         :param param: the parameter name
-        :return: `True` if the parameter is defined by the descriptor, otherwise `False`
+        :return: `True` if the parameter is defined by the descriptor, otherwise
+        `False`
         """
         return param in self._kwargs
 
@@ -45,13 +49,15 @@ class TaskDescriptor(object):
     def params(self) -> Iterable[str]:
         """
         Get the names of all the parameters defined in this descriptor.
+
         :return: an iteration of the names
         """
         return [param for param in self._kwargs]
 
     def get(self, param) -> Any or None:
         """
-        Get a defined parameter value
+        Get a defined parameter value.
+
         :param param: the parameter name
         :return: the parameter value
         :raises KeyError: if the parameter isn't defined
@@ -79,6 +85,69 @@ class TaskDescriptor(object):
         :return: an instance of the task
         """
         return self._cls(**self._kwargs)
+
+
+class RunContext(object):
+    """
+    This is a context object that contains information about a specific task
+    run.
+    """
+    def __init__(self, started: datetime.datetime=None):
+        self._started: datetime.datetime = (
+            started if started is not None else datetime.datetime.now()
+        )
+        self._finished: datetime = None
+
+    @property
+    def started(self) -> datetime.datetime:
+        """
+        When did the run begin?
+
+        :return: the date and time the run began
+        """
+        return self._started
+
+    @property
+    def finished(self) -> datetime.datetime or None:
+        """
+        When did the run finish?
+
+        :return: the date and time the run finished or `None` if the run is
+        not yet finished
+        """
+        return self._finished
+
+    def finish(self):
+        """
+        Indicate that the run is now complete.
+
+        :raises RuntimeError: if the run is already finished
+        """
+        if self._finished is not None:
+            raise RuntimeError('The run has already finished.')
+        self._finished = datetime.datetime.now()
+
+    @property
+    def is_finished(self) -> bool:
+        """
+        Is the run finished?
+
+        :return:  `True` if the task is finished, else `False`
+        """
+        return self._finished is not None
+
+    @property
+    def runtime(self) -> datetime.timedelta or None:
+        """
+        Get the total runtime for the task.
+
+        :return: the delta between the start and finish times of the task, or
+        `None` if the task isn't finished.
+        """
+        if self._finished is None:
+            return None
+        else:
+            return self._finished - self._started
 
 
 class Task(luigi.Task):
@@ -158,29 +227,38 @@ class Task(luigi.Task):
         # If this task doesn't have a proper run ID, we have a problem.
         if self.runid is None or len(str(self.runid).strip()) == 0:
             raise ValueError('The task does not have a run ID.')
-        # Make note of the start time (i.e. right now).
-        start = datetime.datetime.now()
+        # Create a task context.
+        ctx: RunContext = RunContext(started=datetime.datetime.now())  # TODO: Get timezone!
         # Submit this information to the log.
-        self.get_logger().info('The task started at {time} on {date}.'.format(time=start.strftime('%H:%M:%S'),
-                                                                              date=start.strftime('%d/%m/%Y')))
-        # Run the original logic and get the result.  (We don't actually expect a result, but just in case.)
-        result = run()
+        self.get_logger().info(
+            'The task started at {time} on {date}.'.format(
+                time=ctx.started.strftime('%H:%M:%S'),
+                date=ctx.started.strftime('%d/%m/%Y')))
+        # Perform the before-run tasks.
+        self.before_run(ctx=ctx)
+        run()
+        # Perform the run tasks.
+        self.on_run(ctx=ctx)
         # Make note of when the task completed (again... that's right now).
-        end = datetime.datetime.now()
-        # How long did it take?
-        runtime = end - start
+        ctx.finish()
+        # Perform the after-run tasks.
+        self.after_run(ctx=ctx)
         # Log how long the task took.
         self.get_logger().debug(
-            'The task completed successfully in {seconds} seconds.'.format(seconds=runtime.total_seconds()))
-        # TODO: Consider additional reporting for analysis.
-        return result
+            'The task completed successfully in {seconds} seconds.'.format(
+                seconds=ctx.runtime.total_seconds()))
 
-    @abstractmethod
     def run(self):
-        """
-        Override this method to define what the task does when it runs.
-        """
-        raise NotImplementedError('The run method is not implemented. Please define what the task does.')
+        pass
+
+    def before_run(self, ctx: RunContext):
+        pass
+
+    def on_run(self, ctx: RunContext):
+        pass
+
+    def after_run(self, ctx: RunContext):
+        pass
 
     @property
     def friendly_name(self) -> str:
@@ -252,15 +330,17 @@ def taskinfo(friendly_name: str,
     Use this decorator to provide helpful information about your task.
     :param friendly_name: a brief, human-friendly name for the task
     :param synopsis: a brief description of what the task does
-    :param description: a nice, long, thorough description of what this task is expected to do
+    :param description: a nice, long, thorough description of what this task is
+    expected to do
     :param contact: contact information for this task
     :return: The decorator returns the original class, after it's been modified.
     """
     def set_task_info(cls: Type[Task]):
         """
         Update the task information dictionary in the Task class.
+
         :param cls: the :py:class:`Task` class
-        :return:
+        :return: the class
         """
         task_info = cls.get_task_info()
         task_info['friendly_name'] = (
