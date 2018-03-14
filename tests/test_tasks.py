@@ -15,6 +15,7 @@ from luijo.tasks import Task, TaskContact, TaskDescriptor, taskinfo
                         email='pat@daburu.net',
                         phone='180-555-1212'))
 class TestDependencyTask(Task):
+    __test__ = False
     def run(self):
         pass
 
@@ -27,6 +28,7 @@ class TestDependencyTask(Task):
                         email='pat@daburu.net',
                         phone='180-555-1212'))
 class TestTask(Task):
+    __test__ = False
 
     def requires(self):
         return [TaskDescriptor(TestDependencyTask), TestDependencyTask]
@@ -43,6 +45,8 @@ class TestTask(Task):
                         email='pat@daburu.net',
                         phone='180-555-1212'))
 class NoRequirementsTestTask(Task):
+    __test__ = False
+
     def run(self):
         pass
 

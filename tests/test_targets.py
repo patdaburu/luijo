@@ -33,6 +33,8 @@ from luijo.targets import LocalObjectTarget #Target
 #             target.exists()
 
 class TestObject1(object):
+    __test__ = False
+
     def __init__(self, name):
         self.name = name
 
