@@ -239,8 +239,10 @@ class Task(luigi.Task):
         # If the subclass has actually implemented run()...
         if run.__func__ != Task.run:
             # ...complain a little.
-            self.get_logger().warning(
-                'Implement on_run instead of run.')
+            self.get_logger().warning(' '.join([
+                'Implement on_run instead of run.',
+                'Since run is implemented, on_run will be ignored.'
+            ]))
             # Now go ahead and run it.
             run()
         else:
@@ -279,7 +281,10 @@ class Task(luigi.Task):
 
         :param ctx: the current run context
         """
-        raise NotImplementedError('This method must be implemented for the task to do anything useful.')
+        raise NotImplementedError(' '.join([
+            'on_run is not implemented.',
+            'Override on_run in subclasses to perform work when the task runs.'
+        ]))
 
     def after_run(self, ctx: RunContext):
         """
