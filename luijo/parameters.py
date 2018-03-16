@@ -19,6 +19,12 @@ class ClassParameter(luigi.parameter.Parameter):
     """
     @staticmethod
     def parse(x):
+        """
+        Parse a parameter string.
+
+        :param x: the parameter string
+        :return: the parsed value
+        """
         # If the value is  a class (somehow)...
         if isinstance(x, type):
             # ...simply return it.
@@ -50,6 +56,12 @@ class ClassParameter(luigi.parameter.Parameter):
 
     @staticmethod
     def serialize(x):
+        """
+        Serialize an object to a parameter string.
+
+        :param x: the object
+        :return: the parameter string
+        """
         # If the value is already a string...
         if isinstance(x, str):
             # ...just return it.

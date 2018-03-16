@@ -8,5 +8,5 @@
 Extensions for Spotify Luigi
 """
 
-__version__ = '0.0.14'  #: the working version
-__release__ = '0.0.14'  #: the release version
+__version__ = '0.0.15'  #: the working version
+__release__ = '0.0.15'  #: the release version

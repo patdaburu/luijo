@@ -17,10 +17,10 @@ docs: coverage
 	mkdir -p docs/source/_templates
 	cd docs && $(MAKE) html
 
-publish-flightcheck: freeze
+publish-flightcheck:
 	python setup.py sdist
 
-publish:
+publish: clean docs
 	python setup.py sdist upload -r pypi
 
 clean :

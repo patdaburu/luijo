@@ -16,6 +16,24 @@ luijo
     :inherited-members:
     :show-inheritance:
 
+------------
+luijo.errors
+------------
+.. automodule:: luijo.errors
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+-------------
+luijo.logging
+-------------
+.. automodule:: luijo.logging
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
 ----------------
 luijo.parameters
 ----------------
