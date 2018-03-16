@@ -8,12 +8,14 @@
 Herein you'll find kindly assistance for working with Luigi tasks.
 """
 
+from .logging import Loggable
 from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 import datetime
 from functools import partial
 import luigi
 import logging
+import re
 from typing import Any, Dict, Iterable, Type
 
 
@@ -92,11 +94,23 @@ class RunContext(object):
     This is a context object that contains information about a specific task
     run.
     """
-    def __init__(self, started: datetime.datetime=None):
+    def __init__(self,
+                 runid: str,
+                 started: datetime.datetime=None):
+        self._runid = runid  #: the current runid
         self._started: datetime.datetime = (
             started if started is not None else datetime.datetime.now()
-        )
-        self._finished: datetime = None
+        )  #: indicates when the task started
+        self._finished: datetime = None  #: indicates when the task finished
+
+    @property
+    def runid(self) -> str:
+        """
+        Get the run ID.
+
+        :return: the run ID
+        """
+        return self._runid
 
     @property
     def started(self) -> datetime.datetime:
@@ -113,7 +127,7 @@ class RunContext(object):
         When did the run finish?
 
         :return: the date and time the run finished or `None` if the run is
-        not yet finished
+            not yet finished
         """
         return self._finished
 
@@ -141,8 +155,8 @@ class RunContext(object):
         """
         Get the total runtime for the task.
 
-        :return: the delta between the start and finish times of the task, or
-        `None` if the task isn't finished.
+        :return: the delta between the start and finish times of the task, or `None` if the task
+            isn't finished.
         """
         if self._finished is None:
             return None
@@ -150,28 +164,28 @@ class RunContext(object):
             return self._finished - self._started
 
 
-class Task(luigi.Task):
+class Task(luigi.Task, Loggable):
     """
     Extend this class to create your own types of tasks.
     """
     __metaclass__ = ABCMeta
 
-    runid: luigi.Parameter = luigi.Parameter(default='')  #: the ID of the run in which this task is executing
+    runid: luigi.Parameter = luigi.Parameter(default='')  #: identifies the current run context
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Replace the defined 'run' method with a partial function calling the protected wrapper method which will
-        # in turn call the original method.
+        # Replace the defined 'run' method with a partial function calling the protected wrapper
+        # method which will in turn call the original method.
         self.run = partial(self._luijo_run, self.run)
-        # Replace the defined 'requires' method with a partial function calling the protected wrapper method which
-        # will in turn call the original method.
+        # Replace the defined 'requires' method with a partial function calling the protected
+        # wrapper method which will in turn call the original method.
         self.requires = partial(self._luijo_requires, self.requires)
 
-    def _augment_descriptor(self,
-                            descriptor: TaskDescriptor) -> TaskDescriptor:
+    def _augment_descriptor(self, descriptor: TaskDescriptor) -> TaskDescriptor:
         """
         Augment a task descriptor to include desirable parameters.
-        :param descriptor:
+
+        :param descriptor: the task descriptor
         :return: the augmented descriptor
         """
         # Sanity check...
@@ -214,7 +228,7 @@ class Task(luigi.Task):
         Get the output target for the task.
         :return: the output target
         """
-        return luigi.LocalTarget("{basename}.{runid}".format(basename=self.get_logger().name,
+        return luigi.LocalTarget("{basename}.{runid}".format(basename=self.logger.name,
                                                              runid=self.runid))
 
     def _luijo_run(self, run):
@@ -228,9 +242,9 @@ class Task(luigi.Task):
         if self.runid is None or len(str(self.runid).strip()) == 0:
             raise ValueError('The task does not have a run ID.')
         # Create a task context.
-        ctx: RunContext = RunContext(started=datetime.datetime.now())  # TODO: Get timezone!
+        ctx: RunContext = RunContext(runid=str(self.runid), started=datetime.datetime.now())  # TODO: Get timezone!
         # Submit this information to the log.
-        self.get_logger().info(
+        self.logger.info(
             'The task started at {time} on {date}.'.format(
                 time=ctx.started.strftime('%H:%M:%S'),
                 date=ctx.started.strftime('%d/%m/%Y')))
@@ -239,7 +253,7 @@ class Task(luigi.Task):
         # If the subclass has actually implemented run()...
         if run.__func__ != Task.run:
             # ...complain a little.
-            self.get_logger().warning(' '.join([
+            self.logger.warning(' '.join([
                 'Implement on_run instead of run.',
                 'Since run is implemented, on_run will be ignored.'
             ]))
@@ -253,7 +267,7 @@ class Task(luigi.Task):
         # Perform the after-run tasks.
         self.after_run(ctx=ctx)
         # Log how long the task took.
-        self.get_logger().debug(
+        self.logger.debug(
             'The task completed successfully in {seconds} seconds.'.format(
                 seconds=ctx.runtime.total_seconds()))
 
@@ -351,17 +365,9 @@ class Task(luigi.Task):
 
         :return: the metadata dictionary
         """
-        if not hasattr(cls, '_task_info'):
-            cls._task_info = {}
-        return cls._task_info
-
-    @classmethod
-    def get_logger(cls) -> logging.Logger:
-        """
-        Get this task's logger.
-        :return: the task's logger
-        """
-        return logging.getLogger('{module}.{cls}'.format(module=cls.__module__, cls=cls.__name__))  # TODO: Centralize this.
+        if not hasattr(cls, '__task_info__'):
+            cls.__task_info__ = {}
+        return cls.__task_info__
 
 
 def taskinfo(friendly_name: str,
@@ -374,7 +380,7 @@ def taskinfo(friendly_name: str,
     :param friendly_name: a brief, human-friendly name for the task
     :param synopsis: a brief description of what the task does
     :param description: a nice, long, thorough description of what this task is
-    expected to do
+        expected to do
     :param contact: contact information for this task
     :return: The decorator returns the original class, after it's been modified.
     """
@@ -391,7 +397,19 @@ def taskinfo(friendly_name: str,
             '{module}.{cls}'.format(module=cls.__module__, cls=cls.__name__)
         )
         task_info['synopsis'] = synopsis
-        task_info['description'] = description  # TODO: Replace tabs, newlines, and multiple spaces with single spaces.
+        # Retrieve the supplied description, or the docstring.
+        _description = (
+            description if description is not None and len(description.strip()) != 0
+            else cls.__doc__
+        )
+        # If, for any reason, we have no value for the description, it's an empty string.
+        if _description is None:
+            _description = ''
+        else:  # Otherwise remove formatting characters from the description.
+            _description = re.sub(r'[\n\t\s+]', _description, ' ')
+        # In any case, remove the leading and trailing whitespaces on the description.
+        _description = _description.strip()
+        task_info['description'] = _description
         task_info['contact'] = contact
         # Return the original class.
         return cls
