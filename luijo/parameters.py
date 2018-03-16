@@ -56,11 +56,11 @@ class ClassParameter(luigi.parameter.Parameter):
             return x
         elif isinstance(x, type):  # If it's a type...
             # ...format it's fully qualified name.
-            return('{mod}.{cls}').format(mod=x.__module__, cls=x.__name__)
+            return'{mod}.{cls}'.format(mod=x.__module__, cls=x.__name__)
         else:  # Otherwise, we don't know how to deal with this type.
-            raise ValueError('The value must be of type {type} or {str}.'.format(type=type(type),
-
-                                                                                 str=type(str)))
+            raise ValueError(
+                'The value must be of type {type} or {str}.'.format(type=type(type),
+                                                                    str=type(str)))
 
 
 def is_empty_parameter(param: Any):

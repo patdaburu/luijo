@@ -8,6 +8,7 @@
 Herein you'll find kindly assistance for working with Luigi tasks.
 """
 
+from .errors import LuijoException
 from .logging import Loggable
 from abc import ABCMeta, abstractmethod
 from collections import namedtuple
@@ -17,6 +18,13 @@ import luigi
 import logging
 import re
 from typing import Any, Dict, Iterable, Type
+
+
+class TaskRunException(LuijoException):
+    """
+    Raised when a fundamental error occurs pertaining to running a task.
+    """
+    pass
 
 
 TaskContact = namedtuple('TaskContact', ['name', 'email', 'phone'])  #: Contact information for tasks.
@@ -135,10 +143,10 @@ class RunContext(object):
         """
         Indicate that the run is now complete.
 
-        :raises RuntimeError: if the run is already finished
+        :raises TaskRunException: if the run is already finished
         """
         if self._finished is not None:
-            raise RuntimeError('The run has already finished.')
+            raise TaskRunException('The run has already finished.')
         self._finished = datetime.datetime.now()
 
     @property
