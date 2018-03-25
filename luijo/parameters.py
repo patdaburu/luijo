@@ -77,7 +77,8 @@ class ClassParameter(luigi.parameter.Parameter):
 
 def is_empty_parameter(param: Any):
     """
-    Test a parameter to see if it is an empty value.
+    Test a Luigi parameter to see if it is an empty value.
+
     :param param: the parameter
     :return: `True` if the parameter is empty, otherwise `False`
     """

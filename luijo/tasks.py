@@ -49,6 +49,7 @@ class TaskDescriptor(object):
     def defines(self, param) -> bool:
         """
         Does this descriptor define a given parameter?
+
         :param param: the parameter name
         :return: `True` if the parameter is defined by the descriptor, otherwise
         `False`
@@ -85,6 +86,7 @@ class TaskDescriptor(object):
     def copy(self) -> 'TaskDescriptor':
         """
         Make a copy of the descriptor.
+
         :return: a copy of this descriptor
         """
         return TaskDescriptor(cls=self._cls, **self._kwargs)
@@ -92,6 +94,7 @@ class TaskDescriptor(object):
     def instance(self):
         """
         Create an instance of the task.
+
         :return: an instance of the task
         """
         return self._cls(**self._kwargs)
@@ -99,8 +102,7 @@ class TaskDescriptor(object):
 
 class RunContext(object):
     """
-    This is a context object that contains information about a specific task
-    run.
+    This is a context object that contains information about a specific task run.
     """
     def __init__(self,
                  runid: str,
@@ -210,6 +212,7 @@ class Task(luigi.Task, Loggable):
     def _luijo_requires(self, requires):
         """
         This is a wrapper for the task's :py:func:`requires` method.
+
         :param requires: the original :py:func:`requires` method
         :return: an iteration of Luigi targets
         """
@@ -226,7 +229,9 @@ class Task(luigi.Task, Loggable):
 
     def requires(self) -> Iterable[luigi.Task]:
         """
-        Override this method to indicate the tasks that are prerequisite for the successful completion of this task.
+        Override this method to indicate the tasks that are prerequisite for the successful
+        completion of this task.
+
         :return: an iteration of :py:class:`luigi.Task` objects that must run before this begins
         """
         return []
@@ -234,6 +239,7 @@ class Task(luigi.Task, Loggable):
     def output(self) -> luigi.LocalTarget:
         """
         Get the output target for the task.
+
         :return: the output target
         """
         return luigi.LocalTarget("{basename}.{runid}".format(basename=self.logger.name,
@@ -241,8 +247,9 @@ class Task(luigi.Task, Loggable):
 
     def _luijo_run(self, run):
         """
-        This is the method that will be called when the task is run.  It will perform additional logic before and
-        after executing the original :py:func:`luigi.Task.run` function.
+        This is the method that will be called when the task is run.  It will perform additional
+        logic before and after executing the original :py:func:`luigi.Task.run` function.
+
         :param run: the original :py:func:`luigi.Task.run` method
         :return: the result of the original run method
         """
@@ -281,8 +288,8 @@ class Task(luigi.Task, Loggable):
 
     def run(self):
         """
-        Rather than implementing :py:func:`run` take advantage of the
-        run context you can get with :py:func:`on_run`.
+        Rather than implementing :py:func:`run` take advantage of the run context you can get with
+        :py:func:`on_run`.
 
         :raises NotImplementedError: if called
         """

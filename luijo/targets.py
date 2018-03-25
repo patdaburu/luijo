@@ -33,6 +33,7 @@ class LocalObjectTarget(luigi.LocalTarget):
     def serialize(self, obj: Any):
         """
         Serialize an object to the local target.
+
         :param obj: the object you want to serialize
         """
         # Encode the object.
