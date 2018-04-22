@@ -5,8 +5,8 @@
 .. currentmodule:: luiji
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 
-Extensions for Spotify Luigi
+Extensions for Spotify's Luigi.
 """
 
-__version__ = '0.0.15'  #: the working version
-__release__ = '0.0.15'  #: the release version
+__version__ = '0.0.17'  #: the working version
+__release__ = '0.0.17'  #: the release version

@@ -4,7 +4,6 @@
 import pytest
 import unittest
 from luijo.parameters import is_empty_parameter, ClassParameter
-from luijo.tasks import Task
 
 
 class TestParametersSuite(unittest.TestCase):
@@ -22,17 +21,23 @@ class TestParametersSuite(unittest.TestCase):
 class TestClassParameterSuite(unittest.TestCase):
 
     def test_parse_success(self):
-        self.assertIs(Task, ClassParameter.parse('luijo.tasks.Task'))
-        self.assertIs(Task, ClassParameter.parse(Task))
+        self.assertIs(
+            ClassParameter,
+            ClassParameter().parse('luijo.parameters.ClassParameter'))
+        self.assertIs(ClassParameter, ClassParameter().parse(ClassParameter))
 
     def test_serialize_success(self):
-        self.assertEqual('luijo.tasks.Task', ClassParameter.serialize('luijo.tasks.Task'))
-        self.assertEqual('luijo.tasks.Task', ClassParameter.serialize(Task))
+        self.assertEqual('luijo.parameters.ClassParameter',
+                         ClassParameter().serialize(
+                             'luijo.parameters.ClassParameter'))
+        self.assertEqual('luijo.parameters.ClassParameter',
+                         ClassParameter().serialize(ClassParameter))
 
     def test_serialize_raisesValueError(self):
         with pytest.raises(ValueError):
-            s = ClassParameter.serialize(1)  # The argument needs to be a type.
+            # The argument needs to be a type.
+            _ = ClassParameter().serialize(1)
 
     def test_parse_raisesValueError(self):
         with pytest.raises(ValueError):
-            c = ClassParameter.parse(1)  # We can't parse a number
+            _ = ClassParameter().parse(1)  # We can't parse a number
