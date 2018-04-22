@@ -8,10 +8,10 @@
 
 Say something descriptive about the 'config' module.
 """
-import luigi
 import logging
 import os
 from typing import cast
+import luigi
 
 
 class FileSystem(luigi.Config):

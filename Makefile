@@ -12,7 +12,7 @@ freeze:
 lint:
 	pylint $(PROJ_NAME)
 
-test:
+test: lint
 	py.test --cov . tests/
 
 coverage: test
