@@ -36,14 +36,14 @@ setup(
   version=version,
   include_package_data=True,
   install_requires=[
-    'luigi', 'psycopg2', 'SQLAlchemy'
+    'luigi'
   ],
   python_requires=">=3.6.1",
   license='MIT',
   author='Pat Daburu',
   author_email='patb@daburu.net',
   url='https://github.com/patdaburu/luijo.git',  # Use the URL to the github repo.
-  download_url='https://github.com/patdaburu/luiji/archive/{version}.tar.gz'.format(version=version),
+  download_url='https://github.com/patdaburu/luijo/archive/{version}.tar.gz'.format(version=version),
   keywords=[
 
   ],  # arbitrary keywords

@@ -17,6 +17,14 @@ luijo
     :show-inheritance:
 
 ------------
+luijo.config
+------------
+.. automodule:: luijo.config
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+------------
 luijo.errors
 ------------
 .. automodule:: luijo.errors
@@ -25,19 +33,10 @@ luijo.errors
     :inherited-members:
     :show-inheritance:
 
--------------
-luijo.logging
--------------
-.. automodule:: luijo.logging
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-----------------
-luijo.parameters
-----------------
-.. automodule:: luijo.parameters
+----------
+luijo.mock
+----------
+.. automodule:: luijo.mock
     :members:
     :undoc-members:
     :show-inheritance:
@@ -50,10 +49,3 @@ luijo.targets
     :undoc-members:
     :show-inheritance:
 
------------
-luijo.tasks
------------
-.. automodule:: luijo.tasks
-    :members:
-    :undoc-members:
-    :show-inheritance:

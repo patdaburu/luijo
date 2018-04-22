@@ -30,6 +30,7 @@ sys.path.insert(0, _pysrc)
 
 import luijo
 import sphinx_rtd_theme
+from mock import MagicMock
 
 # -- Document __init__ methods by default. --------------------------------
 # This section was added to allow __init__() to be documented automatically.
@@ -43,6 +44,24 @@ def skip(app, what, name, obj, skip, options):
 
 def setup(app):
     app.connect("autodoc-skip-member", skip)
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return MagicMock()
+
+MOCK_MODULES = [
+    'numpy',
+    'scipy',
+    'sklearn',
+    'matplotlib',
+    'matplotlib.pyplot',
+    'scipy.interpolate',
+    'scipy.special',
+    'math',
+    'pandas'
+]
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
 # -- General configuration ------------------------------------------------

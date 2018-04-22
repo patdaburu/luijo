@@ -3,7 +3,7 @@
 
 # Created by pat on 3/9/18
 """
-.. currentmodule:: errors
+.. currentmodule:: luijo.errors
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 
 Something went wrong?  It did.
