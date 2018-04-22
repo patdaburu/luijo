@@ -31,7 +31,7 @@ class LocalObjectTarget(luigi.LocalTarget):
     """
     __metaclass__ = ABCMeta
 
-    # TODO: Add support for binary serialization.
+    # TODO: Add support for binary serialization.  # pylint: disable=fixme
 
     def deserialize(self) -> Any:
         """
