@@ -62,7 +62,7 @@ class LocalObjectTarget(luigi.LocalTarget):
 
     def serialize(self,
                   obj,
-                  format_: Serialization = Serialization.JSON):
+                  format_: Serialization = Serialization.BINARY):
         """
         Serialize an object to the local target.
 
