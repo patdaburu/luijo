@@ -9,9 +9,19 @@ Luigi targets, plus just a little more.
 """
 
 from abc import ABCMeta
-from typing import Any
+from enum import Enum
+import pickle
+import os
 import jsonpickle
 import luigi.target
+
+
+class Serialization(Enum):
+    """
+    These are the supported serialization methods.
+    """
+    JSON = 'json'
+    BINARY = 'binary'
 
 
 def touch(local_target: luigi.LocalTarget):
@@ -31,27 +41,53 @@ class LocalObjectTarget(luigi.LocalTarget):
     """
     __metaclass__ = ABCMeta
 
-    # TODO: Add support for binary serialization.  # pylint: disable=fixme
-
-    def deserialize(self) -> Any:
+    def deserialize(self):
         """
         Retrieve the target object.
+
         :return: the target object
         """
-        with self.open('r') as fin:
-            frozen = fin.read()
-            thawed = jsonpickle.decode(frozen)
-            return thawed
+        # We'll try to use jsonpickle first...
+        try:
+            with self.open('r') as fin:
+                frozen = fin.read()
+                thawed = jsonpickle.decode(frozen)
+                return thawed
+        except UnicodeDecodeError:
+            # If the attempt to unpickle using JSON fails, we assume we have a
+            # binary file.
+            with open(self.path, 'rb') as fin:
+                unpickled = pickle.load(fin)
+                return unpickled
 
-    def serialize(self, obj: Any):
+    def serialize(self,
+                  obj,
+                  format_: Serialization = Serialization.JSON):
         """
         Serialize an object to the local target.
 
         :param obj: the object you want to serialize
+        :param format_: the serialization format
         """
-        # Encode the object.
-        frozen = jsonpickle.encode(obj)
-        # Open the output file for writing.
-        with self.open('w') as fout:
-            # Write the encoded object.
-            fout.write(frozen)
+        if format_ == Serialization.JSON:
+            # Encode the object.
+            frozen = jsonpickle.encode(obj)
+            # Open the output file for writing.
+            with self.open('w') as fout:
+                # Write the encoded object.
+                fout.write(frozen)
+        elif format_ == Serialization.BINARY:
+            # Pickle the object to the file.
+            os.makedirs(
+                os.path.dirname(
+                    os.path.abspath(
+                        os.path.expanduser(
+                            self.path
+                        )
+                    )
+                ), exist_ok=True)
+            with open(self.path, 'wb') as fout:
+                pickle.dump(obj, fout, pickle.HIGHEST_PROTOCOL)
+        else:  # pragma: no cover
+            raise NotImplementedError(
+                f'Unsupported serialization: { format_.name }')
